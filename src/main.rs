@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
-
+mod visual_editor;
+use crate::{visual_editor::component::VisualEditor};
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
 enum Route {
@@ -8,12 +9,14 @@ enum Route {
     Home {},
     #[route("/blog/:id")]
     Blog { id: i32 },
+    #[route("/schemas/")]
+    VisualEditor {}
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
+const SCHEMA_BUILDER_CSS: Asset = asset!("/assets/schema.css");
 const HEADER_SVG: Asset = asset!("/assets/header.svg");
-const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
     dioxus::launch(App);
@@ -23,7 +26,8 @@ fn main() {
 fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS } document::Link { rel: "stylesheet", href: TAILWIND_CSS }
+        document::Link { rel: "stylesheet", href: MAIN_CSS } 
+        document::Link { rel: "stylesheet", href: SCHEMA_BUILDER_CSS } 
         Router::<Route> {}
     }
 }
@@ -61,10 +65,13 @@ pub fn Blog(id: i32) -> Element {
     rsx! {
         div {
             id: "blog",
-
+            h2 { "asd" }
             // Content
-            h1 { "This is blog #{id}!" }
-            p { "In blog #{id}, we show how the Dioxus router works and how URL parameters can be passed as props to our route components." }
+            h1 { "This asd is blog #{id}!" }
+            p { 
+                "In blog #{id}, we show how the Dioxus router works and how URL 
+                parameters can be passed as props to our route components." 
+            }
 
             // Navigation links
             Link {
@@ -91,6 +98,10 @@ fn Navbar() -> Element {
                 "Home"
             }
             Link {
+                to: Route::VisualEditor {},
+                "Schema"
+            }
+            Link {
                 to: Route::Blog { id: 1 },
                 "Blog"
             }
@@ -103,7 +114,7 @@ fn Navbar() -> Element {
 /// Echo component that demonstrates fullstack server functions.
 #[component]
 fn Echo() -> Element {
-    let mut response = use_signal(|| String::new());
+    let mut response = use_signal(String::new);
 
     rsx! {
         div {
@@ -130,5 +141,5 @@ fn Echo() -> Element {
 /// Echo the user input on the server.
 #[server(EchoServer)]
 async fn echo_server(input: String) -> Result<String, ServerFnError> {
-    Ok(input)
+    Ok(input + "nigga")
 }
