@@ -13,13 +13,15 @@ pub fn StyleInput(component_id: usize) -> Element {
     let style_pairs: HashMap<String, String> = component.styles.clone();
 
     rsx!(
-        div { style: "display: flex; flex-direction: column; gap: 12px;",
+        div { 
+            class: "styles-editor",
             for (key, value) in style_pairs {
                 {
                     let key_c = key.clone();
+                    let key_c1 = key.clone();
                     rsx!(
-                        div { style: "display:flex; gap:8px;",
-                            textarea {
+                        div { 
+                            input {
                                 value: "{key}",
                                 oninput: move |e| {
                                     let mut state = EDITOR_STATE.write();
@@ -30,7 +32,7 @@ pub fn StyleInput(component_id: usize) -> Element {
                                     }
                                 }
                             }
-                            textarea {
+                            input {
                                 value: "{value}",
                                 oninput: move |e| {
                                     let mut state = EDITOR_STATE.write();
@@ -39,6 +41,16 @@ pub fn StyleInput(component_id: usize) -> Element {
                                     }
                                 }
                             }
+                            button {
+                                onclick: move |_| {
+                                    let mut state = EDITOR_STATE.write();
+                                    if let Some(comp) = state.components.get_mut(&component_id) {
+                                        comp.styles.remove(&key_c1);
+                                    }
+                                },
+                                "X"
+                            }
+
                         }
                     )
                 }
@@ -48,7 +60,6 @@ pub fn StyleInput(component_id: usize) -> Element {
                 onclick: move |_| {
                     let mut state = EDITOR_STATE.write();
                     if let Some(comp) = state.components.get_mut(&component_id) {
-                        // generate unique placeholder key
                         let mut new_key = "new-property".to_string();
                         let mut counter = 1;
                         while comp.styles.contains_key(&new_key) {

@@ -58,8 +58,8 @@ pub static EDITOR_STATE: GlobalSignal<EditorState> = Signal::global(EditorState:
 #[component]
 pub fn VisualEditor() -> Element {
     let state = EDITOR_STATE.read();
-    let editor_bg = if state.mode == EditorMode::Editor { "#6196f3" } else { "white" };
-    let preview_bg = if state.mode == EditorMode::Preview { "#2196f3" } else { "white" };
+    let editor_bg = if state.mode == EditorMode::Editor { "var(--color-primary)" } else { "var(--color-secondary)" };
+    let preview_bg = if state.mode == EditorMode::Preview { "var(--color-primary)" } else { "var(--color-secondary)" };
     
     rsx! {
         div {
@@ -68,8 +68,6 @@ pub fn VisualEditor() -> Element {
             
             div {
                 class: "toolbox",
-                style: "width: 250px; border-right: 1px solid #ccc; padding: 16px; overflow-y: auto; background: #fafafa; font-family: Veranda, sans-serif",
-                
                 h2 { style: "margin: 0 0 16px 0; font-size: 18px;", "Components" }
                 
                 div {
@@ -77,12 +75,12 @@ pub fn VisualEditor() -> Element {
                     style: "margin-bottom: 16px; display: flex; gap: 8px;",
                     button {
                         onclick: move |_| set_mode(EditorMode::Editor),
-                        style: "flex: 1; border-radius:.5rem ;padding: 8px; cursor: pointer; background: {editor_bg}; border: 2px solid #ccc;",
+                        style: "background: {editor_bg};",
                         "Editor"
                     }
                     button {
                         onclick: move |_| set_mode(EditorMode::Preview),
-                        style: "flex: 1; border-radius: .5rem ;padding: 8px; cursor: pointer; background: {preview_bg}; border: 1px solid #ccc;",
+                        style: "background: {preview_bg};",
                         "Preview"
                     }
                 }
@@ -94,17 +92,14 @@ pub fn VisualEditor() -> Element {
                         
                         button {
                             onclick: move |_| add_component(ComponentType::Container),
-                            style: "padding: 12px; text-align:center; cursor: pointer; border: 1px solid #ccc; border-radius: .5rem; background: white;",
                             "Container"
                         }
                         button {
                             onclick: move |_| add_component(ComponentType::Heading),
-                            style: "padding: 12px; cursor: pointer; text-align: center; border: 1px solid #ccc; border-radius: .5rem; background: white;",
                             "Heading"
                         }
                         button {
                             onclick: move |_| add_component(ComponentType::Paragraph),
-                            style: "padding: 12px; cursor: pointer; text-align: center; border: 1px solid #ccc; border-radius: .5rem; background: white;",
                             "Paragraph"
                         }
                     }
@@ -140,7 +135,6 @@ pub fn VisualEditor() -> Element {
             if state.mode == EditorMode::Editor {
                 div {
                     class: "properties",
-                    style: "width: 300px; border-left: 1px solid #ccc; overflow-y: auto; background: #29193a;",
                     PropertiesPanel {}
                 }
             }
@@ -295,7 +289,8 @@ fn ComponentBox(component_id: usize) -> Element {
                 }
             } else if !component_content.is_empty() {
                 div {
-                    style: "color: rgba(255,255,255,0.9); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;",
+                    style: "color: rgba(255,255,255,0.9); font-size: 12px; 
+                            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;",
                     "{component_content}"
                 }
             }
@@ -324,25 +319,24 @@ fn PropertiesPanel() -> Element {
         div { class: "properties-panel",
             if component.component_type != ComponentType::Container {
                 div { 
-                    h1 { style: "color:slate;", "Content" }
+                    style: "display:flex;flex-direction:column;padding-inline:12px;",
+                    h1 { style: "color:slate;text-align:center; margin: 24px 0 12px 0; font-size: 18px;", "Content" }
 
-                    label { style: "display: block; margin-bottom: 4px; font-weight: 500;", "Content" }
                     input {
                         r#type: "text",
                         value: "{component.content}",
                         oninput: move |e| update_content(selected_id, e.value()),
-                        style: "width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;",
                     }
                 }
             }
             
-            h1 { style: "color:slate; margin: 24px 0 12px 0; font-size: 14px;", "Styles" }
+            h1 { style: "color:slate;text-align:center; margin: 24px 0 12px 0; font-size: 18px;", "Styles" }
             
             StyleInput { component_id: selected_id }
    
             if component.component_type == ComponentType::Container {
-                h4 { style: "margin: 24px 0 12px 0; font-size: 14px;", "Children" }
-                div { style: "font-size: 12px; color: #666;",
+                h4 { style: "margin: 24px 0 12px 12px; font-size: 14px;", "Children" }
+                div { style: "font-size: 12px; color: #666;margin: 12px 0 0 12px;",
                     if component.children.is_empty() {
                         "No children yet"
                     } else {
@@ -351,15 +345,16 @@ fn PropertiesPanel() -> Element {
                 }
                 button {
                     onclick: move |_| add_child_to_container(selected_id),
-                    style: "margin-top: 8px; padding: 6px 12px; cursor: pointer;",
-                    "➕ Add Child Connection"
+                    style: "margin: 12px 0 0 12px; padding: 6px 12px; cursor: pointer;",
+                    "Add Child Connection"
                 }
             }
             
-            div { style: "margin-top: 24px;",
+            div { style: "margin-top: 24px; padding-inline: 12px",
                 button {
                     onclick: move |_| delete_component(selected_id),
-                    style: "width: 100%; padding: 8px; cursor: pointer; background: #f44336; color: white; border: none; border-radius: 4px;",
+                    style: "width: 100%; padding: 8px; cursor: pointer; 
+                            background: #f44336; color: white; border: none; border-radius: 4px;",
                     "Delete Component"
                 }
             }
